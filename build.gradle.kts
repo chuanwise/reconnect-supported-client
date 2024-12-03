@@ -16,6 +16,7 @@
 
 plugins {
     kotlin("jvm") version "1.8.10"
+    id("me.him188.kotlin-jvm-blocking-bridge") version "3.0.0-180.1"
 }
 
 group = "cn.chuanwise"
@@ -26,20 +27,26 @@ repositories {
 }
 
 dependencies {
+    val blockingBridge = "3.0.0-180.1"
+    implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:$blockingBridge")
+
     val coroutines = "1.8.1"
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
 
-    val logging = "5.1.0"
+    val logging = "5.0.0"
     implementation("io.github.oshai:kotlin-logging-jvm:$logging")
 
-    val slf4j = "2.0.13"
+    val slf4j = "2.0.16"
     implementation("org.slf4j:slf4j-api:$slf4j")
-    runtimeOnly("org.slf4j:slf4j-simple:$slf4j")
+
+    val log4j = "2.24.2"
+    testRuntimeOnly("org.apache.logging.log4j:log4j-core:$log4j")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$log4j")
 
     val ktor = "2.3.10"
-    implementation("io.ktor:ktor-server-core-jvm:$ktor")
-    implementation("io.ktor:ktor-server-websockets-jvm:$ktor")
-    implementation("io.ktor:ktor-server-netty-jvm:$ktor")
+    testImplementation("io.ktor:ktor-server-core-jvm:$ktor")
+    testImplementation("io.ktor:ktor-server-websockets-jvm:$ktor")
+    testImplementation("io.ktor:ktor-server-netty-jvm:$ktor")
     implementation("io.ktor:ktor-websockets:$ktor")
     implementation("io.ktor:ktor-client-okhttp:$ktor")
 
