@@ -86,7 +86,7 @@ interface ReconnectSupportedClient : CoroutineScope {
     suspend fun send(string: String)
 }
 
-suspend fun ReconnectSupportedClient.awaitUntilConnected() {
+fun ReconnectSupportedClient.awaitUntilConnected() {
     while (!isConnected) {
         await()
     }
