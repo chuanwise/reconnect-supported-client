@@ -81,7 +81,7 @@ class WebSocketReconnectSupportedClient(
     private val lock = ReentrantReadWriteLock()
     private val stateUpdateCondition = lock.writeLock().newCondition()
 
-    private val address = "$host:$port"
+    private val address = "$host:$port$path"
 
     private val manageHttpClient = manageHttpClient ?: (httpClient == null)
     private val httpClient = httpClient ?: HttpClient { install(WebSockets) }
@@ -99,8 +99,7 @@ class WebSocketReconnectSupportedClient(
     }
 
     private var stateNoLock = State.CREATED
-    private val state: State
-        get() = lock.read { stateNoLock }
+    private val state: State get() = lock.read { stateNoLock }
 
     private var channelNoLock: Channel<String>? = null
 
@@ -136,6 +135,8 @@ class WebSocketReconnectSupportedClient(
 
     // WebSocket 会话，用于在其他地方调用 send 和 close 等函数。
     private var sessionNoLock: ClientWebSocketSession? = null
+    private val session: ClientWebSocketSession get() = lock.read { sessionNoLock ?: error("Connection not established.") }
+
     private var connectingJobNoLock: Job? = null
 
     private fun setConnectingJobNoLock() {
@@ -325,23 +326,21 @@ class WebSocketReconnectSupportedClient(
         }
     }
 
-    override suspend fun await() {
+    override fun await() {
         lock.write {
             stateUpdateCondition.await()
         }
     }
 
-    override suspend fun await(time: Long, unit: TimeUnit) : Boolean {
+    override fun await(time: Long, unit: TimeUnit) : Boolean {
         return lock.write {
             stateUpdateCondition.await(time, unit)
         }
     }
 
-    override val channel: Channel<String>
-        get() = lock.read { channelNoLock ?: error("Connection not established.") }
+    override val channel: Channel<String> get() = lock.read { channelNoLock ?: error("Connection not established.") }
 
     override suspend fun send(string: String) {
-        val session = sessionNoLock ?: error("Connection not established.")
         logger.trace { "Send: $string." }
 
         session.send(Frame.Text(string))

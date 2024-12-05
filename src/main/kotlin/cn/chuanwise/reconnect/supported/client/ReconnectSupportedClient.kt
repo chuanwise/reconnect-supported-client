@@ -60,9 +60,8 @@ interface ReconnectSupportedClient : CoroutineScope {
     /**
      * 等待连接状态发生变化。
      */
-    @JvmBlockingBridge
     @Throws(InterruptedException::class)
-    suspend fun await()
+    fun await()
 
     /**
      * 等待连接状态发生变化。
@@ -70,9 +69,8 @@ interface ReconnectSupportedClient : CoroutineScope {
      * @param time 等待时间
      * @param unit 时间单位
      */
-    @JvmBlockingBridge
     @Throws(InterruptedException::class)
-    suspend fun await(time: Long, unit: TimeUnit = TimeUnit.MILLISECONDS): Boolean
+    fun await(time: Long, unit: TimeUnit = TimeUnit.MILLISECONDS): Boolean
 
     /**
      * 用于接受服务端发送消息的通道。
